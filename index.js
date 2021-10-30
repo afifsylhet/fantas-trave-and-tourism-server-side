@@ -23,6 +23,7 @@ async function run() {
         await client.connect();
         const database = client.db("fantasy_travel");
         const serviceCollection = database.collection("services");
+        const serviceCollectionNew = database.collection("selectedServices");
 
         app.get('/services', async (req, res) => {
             const query = serviceCollection.find({});
@@ -30,7 +31,22 @@ async function run() {
             res.send(cursor);
         })
 
+        app.get('/services/myOrder', async (req, res) => {
+            const query = serviceCollectionNew.find({});
+            const cursor = await query.toArray();
+            res.send(cursor);
+        })
 
+
+
+
+        app.post('/services/myOrder', async (req, res) => {
+            const newUser = req.body;
+            const result = await serviceCollectionNew.insertOne(newUser);
+            console.log("got new user", req.body);
+            console.log("added user", result);
+            res.json(result);
+        });
 
 
 
