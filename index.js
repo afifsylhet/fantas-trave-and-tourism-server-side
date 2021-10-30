@@ -1,6 +1,9 @@
 const express = require('express');
 require('dotenv').config()
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
+
+
 
 const cors = require('cors');
 const app = express();
@@ -40,13 +43,52 @@ async function run() {
 
 
 
-        app.post('/services/myOrder', async (req, res) => {
+        app.patch('/services/myOrder', async (req, res) => {
             const newUser = req.body;
+            if (!newUser.quantity) {
+                newUser.quantity = 1;
+            } else {
+                newUser.quantity = parseInt(newUser.quantity) + 1;
+            }
             const result = await serviceCollectionNew.insertOne(newUser);
             console.log("got new user", req.body);
             console.log("added user", result);
             res.json(result);
         });
+
+
+
+
+
+        app.delete('/services/myOrder', async (req, res) => {
+            const id = req.body._id;
+            console.log(id);
+            const query = { _id: id };
+            const result = await serviceCollectionNew.deleteOne(query);
+            res.json(result)
+            console.log(result)
+        })
+
+        app.put('/services/myOrder', async (req, res) => {
+            const id = req.body._id;
+            console.log(id);
+            const query = { _id: id };
+            const options = { upsert: true };
+
+            const updateDoc = {
+                $set:
+                {
+                    status: "Approved"
+                }
+
+            };
+
+            const result = await serviceCollectionNew.updateOne(query, updateDoc);
+            // console.log("got new user", req.body);
+            console.log("package approved", result);
+            res.json(result);
+        });
+
 
 
 
