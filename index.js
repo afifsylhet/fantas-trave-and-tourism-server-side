@@ -34,6 +34,14 @@ async function run() {
             res.send(cursor);
         })
 
+        app.post('/services', async (req, res) => {
+            const newService = req.body;
+            const result = await serviceCollection.insertOne(newService);
+            console.log("got new user", req.body);
+            console.log("added user", result);
+            res.json(result);
+        });
+
         app.get('/services/myOrder', async (req, res) => {
             const query = serviceCollectionNew.find({});
             const cursor = await query.toArray();
